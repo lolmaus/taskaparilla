@@ -1,0 +1,22 @@
+<div>
+  {{#if isEditing}}
+    {{input value=task.title}}
+    {{ view 'select'
+      content=tasksWithoutCurrent
+      optionValuePath='content.id'
+      optionLabelPath='content.title'
+      selection=task.parent
+    }}
+    <button {{action 'save'}}>Save</button>
+  {{else}}
+    <p>
+      {{task.title}}
+      <button {{action 'edit'}}>Edit</button>
+      <button {{action 'delete'}}>Delete</button>
+    </p>
+    {{ task-list
+      task=task
+      allTasks=allTasks
+    }}
+  {{/if}}
+</div>
