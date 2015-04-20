@@ -16,6 +16,11 @@ TaskListComponent = Ember.Component.extend
     else
       null
 
+  sortedTasks: Ember.computed 'tasks', ->
+    @get 'tasks'
+      .slice()
+      .sortBy 'position'
+
   initSortable: Ember.on 'didInsertElement', ->
     element =
       @$ '.tasklist-list'
@@ -26,10 +31,13 @@ TaskListComponent = Ember.Component.extend
         group: 'tasks'
 
         onUpdate: (event) =>
-          console.log 'onUpdate', event
+          @onAdd event
 
         onAdd: (event) =>
           @onAdd event
+
+
+
 
 
   onAdd: (event) ->

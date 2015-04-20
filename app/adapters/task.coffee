@@ -14,6 +14,7 @@ TaskAdapter = ApplicationAdapter.extend
           .all 'task'
           .filter (candidate) ->
             candidate isnt movedTask \
+            and not candidate.get('isNew') \
             and `candidate.get('parent') == oldParentTask` \
             and candidate.get('position') >= oldPosition
 
@@ -26,10 +27,11 @@ TaskAdapter = ApplicationAdapter.extend
         .all 'task'
         .filter (candidate) ->
           candidate isnt movedTask \
+          and not candidate.get('isNew') \
           and `candidate.get('parent') == newParentTask`
 
     newAffectedTasks =
-      if newPosition
+      if newPosition?
         newSiblings.filter (candidate) ->
           candidate.get('position') >= newPosition
       else
@@ -51,6 +53,26 @@ TaskAdapter = ApplicationAdapter.extend
         .concat movedTask, oldAffectedTasks, newAffectedTasks
         .map (task) ->
           task.save()
+
+    console.log '----------------'
+
+    @store
+      .all 'task'
+      .filter (task) -> not task.get('parent') and not task.get('isNew')
+      .sortBy 'position'
+      .map (task) ->
+        console.log "#{task.get 'title'}: #{task.get 'position'}"
+
+        task.get 'children'
+          .sortBy 'position'
+          .map (task) ->
+            console.log "-- #{task.get 'title'}: #{task.get 'position'}"
+
+            task.get 'children'
+              .sortBy 'position'
+              .map (task) ->
+                console.log "---- #{task.get 'title'}: #{task.get 'position'}"
+
 
     Ember.RSVP.all savePromises
 
