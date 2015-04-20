@@ -54,27 +54,34 @@ TaskAdapter = ApplicationAdapter.extend
         .map (task) ->
           task.save()
 
-    console.log '----------------'
-
-    @store
-      .all 'task'
-      .filter (task) -> not task.get('parent') and not task.get('isNew')
-      .sortBy 'position'
-      .map (task) ->
-        console.log "#{task.get 'title'}: #{task.get 'position'}"
-
-        task.get 'children'
-          .sortBy 'position'
-          .map (task) ->
-            console.log "-- #{task.get 'title'}: #{task.get 'position'}"
-
-            task.get 'children'
-              .sortBy 'position'
-              .map (task) ->
-                console.log "---- #{task.get 'title'}: #{task.get 'position'}"
-
 
     Ember.RSVP.all savePromises
+      .then =>
+        # DEBUG OUTPUT
+        console.log '----------------'
+
+        debugTask = (task, depth = 0) ->
+          prefix = ""
+
+          [0 .. depth].forEach (i) ->
+            return if i is 0
+            prefix += ". "
+
+          console.log "#{prefix}#{task.get 'title'}: #{task.get 'position'}"
+
+          task.get 'children'
+            .sortBy 'position'
+            .map (task) ->
+              debugTask task, depth + 1
+
+        @store
+          .all 'task'
+          .filter (task) -> not task.get('parent') and not task.get('isNew')
+          .sortBy 'position'
+          .map (task) ->
+            debugTask task
+
+
 
 
 
